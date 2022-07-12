@@ -1,0 +1,7 @@
+lockfileVersion: 5.4
+
+specifiers:
+  project-b: workspace:^1.0.0
+
+dependencies:
+  project-b: link:../project-b
