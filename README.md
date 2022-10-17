@@ -1,37 +1,20 @@
 # pnpm repro
 
-Issues with `pnpm install` and `recursive-install=false`
+`pnpm --silent install` does not show an error message on error.
 
-1. Project not found when running `pnpm install` inside a project directory.
+Repro:
 
-    ```sh
-    $ cd project-b/src
-    $ pnpm install
-    No projects matched the filters in "/Users/stoubia/repos/pnpm-multi-lockfile"
-    ```
+`project-b` package defines an invalid dependency `package-does-not-exist`
 
-    Expected: pnpm should find the project root by walking up the directory tree.
+```sh
+$ cd project-b
+$ pnpm --silent install
 
-2. `--dir`/`-C` does not work for `pnpm install`.
+$ pnpm install
+ ERR_PNPM_FETCH_404  GET https://registry.npmjs.org/package-does-not-exist: Not Found - 404
 
-    [Repro script](./project-b/bin/install2.sh)
+package-does-not-exist is not in the npm registry, or you have no permission to fetch it.
 
-    ```sh
-    $ cd project-b/src
-    $ pnpm --dir .. install
-    No projects matched the filters in "/Users/stoubia/repos/pnpm-multi-lockfile"
-    ```
-
-    Expected: pnpm should run the install command from the specified directory.
-
-3. pnpm exits with 0 exit code when project not found
-
-    ```sh
-    $ cd project-b/src
-    $ pnpm install
-    No projects matched the filters in "/Users/stoubia/repos/pnpm-multi-lockfile"
-    $ echo $?
-    0
-    ```
-
-    Expected: pnpm should output a non-zero exit code.
+No authorization header was set for the request.
+Progress: resolved 0, reused 1, downloaded 0, added 0
+```
