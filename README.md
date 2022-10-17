@@ -1,40 +1,37 @@
 # pnpm repro
 
-Scripts are being skipped when --if-present is passed
+Issues with `pnpm install` and `recursive-install=false`
 
-## Repro
+1. Project not found when running `pnpm install` inside a project directory.
 
-```sh
-$ cd project-a
+    ```sh
+    $ cd project-b/src
+    $ pnpm install
+    No projects matched the filters in "/Users/stoubia/repos/pnpm-multi-lockfile"
+    ```
 
-$ pnpm tsc
-src/index.ts:4:6 - error TS2304: Cannot find name 'Unreferenced'.
+    Expected: pnpm should find the project root by walking up the directory tree.
 
-4   a: Unreferenced;
-       ~~~~~~~~~~~~
+2. `--dir`/`-C` does not work for `pnpm install`.
 
+    [Repro script](./project-b/bin/install2.sh)
 
-Found 1 error in src/index.ts:4
+    ```sh
+    $ cd project-b/src
+    $ pnpm --dir .. install
+    No projects matched the filters in "/Users/stoubia/repos/pnpm-multi-lockfile"
+    ```
 
-$ pnpm run test
+    Expected: pnpm should run the install command from the specified directory.
 
-> project-a@1.0.0 test /Users/stoubia/repos/pnpm-multi-lockfile/project-a
-> pnpm tsc && echo "Test 2"
+3. pnpm exits with 0 exit code when project not found
 
-src/index.ts:4:6 - error TS2304: Cannot find name 'Unreferenced'.
+    ```sh
+    $ cd project-b/src
+    $ pnpm install
+    No projects matched the filters in "/Users/stoubia/repos/pnpm-multi-lockfile"
+    $ echo $?
+    0
+    ```
 
-4   a: Unreferenced;
-       ~~~~~~~~~~~~
-
-
-Found 1 error in src/index.ts:4
-
- ELIFECYCLE  Test failed. See above for more details.
-
-$ pnpm run --if-present test
-
-> project-a@1.0.0 test /Users/stoubia/repos/pnpm-multi-lockfile/project-a
-> pnpm tsc && echo "Test 2"
-
-Test 2
-```
+    Expected: pnpm should output a non-zero exit code.
