@@ -1,16 +1,18 @@
 {
-  "name": "project-b",
+  "name": "tool-a",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "eslint": "./node_modules/.bin/eslint"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "gifsicle": "^7.0.1",
-    "tool-a": "workspace:^1.0.0"
+    "eslint": "^8.26.0"
   }
 }

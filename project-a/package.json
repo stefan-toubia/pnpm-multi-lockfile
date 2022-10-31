@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "project-b": "workspace:^1.0.0"
+    "project-b": "workspace:^1.0.0",
+    "tool-a": "workspace:^1.0.0",
+    "tool-b": "workspace:^1.0.0"
   }
 }

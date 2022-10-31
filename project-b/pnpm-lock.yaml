@@ -2,9 +2,11 @@ lockfileVersion: 5.4
 
 specifiers:
   gifsicle: ^7.0.1
+  tool-a: workspace:^1.0.0
 
 dependencies:
   gifsicle: 7.0.1
+  tool-a: link:../common/tool-a
 
 packages:
 

@@ -2,6 +2,10 @@ lockfileVersion: 5.4
 
 specifiers:
   project-b: workspace:^1.0.0
+  tool-a: workspace:^1.0.0
+  tool-b: workspace:^1.0.0
 
 dependencies:
   project-b: link:../project-b
+  tool-a: link:../common/tool-a
+  tool-b: link:../common/tool-b

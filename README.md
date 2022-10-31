@@ -1,62 +1,51 @@
-# Multi-lockfile pnpm project
+# Install bin race
 
-Project for reproducing issues with the side-effect caching that causes
-lifecycle scripts to always be run during `pnpm install`.
-
-## Repro steps
-
-1. Install this project
-
-    pnpm i
-
-2. Run install a second time, note that the gifsicle postinstall script has run.
-
-3. Enable shared lockfile in `.npmrc`.
-
-4. Run install to generate the shared lockfile.
-
-5. Run install again, note that lifecycle scripts have not run.
+There seems to be a race condition on pnpm install when projects define `bin`
+scripts. Sometimes this only results in a warning, but sometimes installs fail.
 
 ```sh
-# Step 1
-~/src/pnpm-multi-lockfile on  master! ⌚ 11:53:42
 $ pnpm i
-Scope: all 2 workspace projects
-project-b                                | +171 +++++++++++++++++
+Scope: all 4 workspace projects
+Lockfile is up-to-date, resolution step is skipped
+Packages: +380
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Packages are hard linked from the content-addressable store to the virtual store.
-  Content-addressable store is at: /Users/stoubia/Library/pnpm/store/v3
-  Virtual store is at:             project-a/node_modules/.pnpm
-project-b                                | Progress: resolved 171, reused 171, downloaded 0, added 171, done
-project-b/node_modules/.pnpm/gifsicle@7.0.1/node_modules/gifsicle: Running postinstall script, done in 556ms
-
-# Step 2
-~/src/pnpm-multi-lockfile on  master! ⌚ 11:53:46
-$ pnpm i
-Scope: all 2 workspace projects
-project-b/node_modules/.pnpm/gifsicle@7.0.1/node_modules/gifsicle: Running postinstall script, done in 235ms
-
-# Step 4
-~/src/pnpm-multi-lockfile on  master! ⌚ 11:55:25
-$ pnpm i
-Scope: all 2 workspace projects
-project-b                                |  WARN  deprecated uuid@3.4.0
-Packages: +171
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Packages are hard linked from the content-addressable store to the virtual store.
-  Content-addressable store is at: /Users/stoubia/Library/pnpm/store/v3
+  Content-addressable store is at: /Users/stoubia/Library/Caches/pnpm/store/v3
   Virtual store is at:             node_modules/.pnpm
-Progress: resolved 209, reused 171, downloaded 0, added 171, done
+ WARN  Failed to create bin at /Users/stoubia/repos/pnpm-multi-lockfile/project-a/node_modules/.bin/eslint. The source file at /Users/stoubia/repos/pnpm-multi-lockfile/common/tool-a/node_modules/.bin/eslint does not exist.
+ WARN  Failed to create bin at /Users/stoubia/repos/pnpm-multi-lockfile/project-a/node_modules/.bin/stylelint. The source file at /Users/stoubia/repos/pnpm-multi-lockfile/common/tool-b/node_modules/.bin/stylelint does not exist.
+Progress: resolved 380, reused 380, downloaded 0, added 380, done
+```
 
-# Step 5
-~/src/pnpm-multi-lockfile on  master! ⌚ 11:55:40
+Second install (hard to reproduce):
+
+```sh
 $ pnpm i
-Scope: all 2 workspace projects
+Scope: all 4 workspace projects
 Lockfile is up-to-date, resolution step is skipped
 Already up-to-date
+ ENOENT  ENOENT: no such file or directory, chmod '/Users/stoubia/repos/pnpm-multi-lockfile/common/tool-a/node_modules/.bin/eslint'
+```
 
-~/src/pnpm-multi-lockfile on  master! ⌚ 11:58:12
+Third install:
+
+```sh
 $ pnpm i
-Scope: all 2 workspace projects
+Scope: all 4 workspace projects
 Lockfile is up-to-date, resolution step is skipped
 Already up-to-date
 ```
+
+## Repro steps
+
+Delete all `node_module` directories
+
+    # From the project root
+    npx rimraf ./**/node_modules
+
+Install all, you should get a warning like the first `pnpm i` run above.
+
+    pnpm install
+
+Run `pnpm i` again, you won't get a warning but sometimes install will fail with
+second error above.
